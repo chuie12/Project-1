@@ -116,6 +116,10 @@ class Logic(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, "Error", "Score must be a number")
             return
 
+        if new_score > 100:
+            QMessageBox.warning(self, "Error", "Score cannot exceed 100")
+            return
+
         if old_name != new_name:
             if old_name in self.gradebook:
                 del self.gradebook[old_name]
