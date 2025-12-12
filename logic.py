@@ -1,12 +1,17 @@
 from PyQt6.QtWidgets import *
 from gui import *
 import csv
+from typing import Dict, TypedDict, Optional
+
+class GradeInfo(TypedDict, total = False):
+    Score: int
+    Grade: str
 
 class Logic(QMainWindow, Ui_MainWindow):
     """Main Window
 
     Initializes the gradebook dictionary and button functionality on the GUI"""
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
 
@@ -20,22 +25,22 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.pushButton_load.clicked.connect(self.load)
         self.listWidget_grades.itemClicked.connect(self.prefill_inputs)
 
-    def prefill_inputs(self, item):
+    def prefill_inputs(self, item: QListWidgetItem) -> None:
         """This displays the selected line's name and score in their respective input lines"""
         line = item.text()
         name, score, *_ = line.split(" : ")
         self.lineEdit_name.setText(name)
         self.lineEdit_score.setText(score)
 
-    def grade_curve(self):
+    def grade_curve(self) -> None:
         """Checks for existence of a gradebook dictionary then assigns curved grades based on the highest score in the gradebook dictionary"""
         if not self.gradebook:
             return
 
-        high_score = max(int(info["Score"]) for info in self.gradebook.values())
+        high_score: int = max(int(info["Score"]) for info in self.gradebook.values())
 
         for name, info in self.gradebook.items():
-            score = info["Score"]
+            score: int = info["Score"]
             if score >= (high_score - 10):
                 letter = "A"
             elif score >= (high_score - 20):
@@ -49,29 +54,29 @@ class Logic(QMainWindow, Ui_MainWindow):
 
             info["Grade"] = letter
 
-    def update_list(self):
+    def update_list(self) -> None:
         """Updates the gradebook dictionary with grades and then sorts entries by name"""
         self.listWidget_grades.clear()
         for name, info in self.gradebook.items():
-            score = info["Score"]
-            grade = info.get("Grade", "")
+            score: int = info["Score"]
+            grade: str = info.get("Grade", "")
             text = f"{name} : {score}"
             if grade:
                 text += f" : {grade}"
             self.listWidget_grades.addItem(text)
             self.listWidget_grades.sortItems()
 
-    def add(self):
+    def add(self) -> None:
         """Add a student and score to the gradebook dictionary"""
-        name = self.lineEdit_name.text().strip()
-        score = self.lineEdit_score.text().strip()
+        name: str = self.lineEdit_name.text().strip()
+        score: str = self.lineEdit_score.text().strip()
 
         if not name or not score:
             QMessageBox.warning(self, "Error", "Please enter your name and your score")
             return
 
         try:
-            score = int(score)
+            score: int = int(score)
         except ValueError:
             QMessageBox.warning(self, "Error", "Score must be a number")
             return
@@ -87,26 +92,26 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.lineEdit_name.clear()
         self.lineEdit_score.clear()
 
-    def edit(self):
+    def edit(self) -> None:
         """Edits the gradebook name and score using the selected line in the list widget"""
-        item_to_edit = self.listWidget_grades.currentItem()
+        item_to_edit: Optional[QListWidgetItem] = self.listWidget_grades.currentItem()
 
         if item_to_edit is None:
             QMessageBox.warning(self, "Error", "Please select a line to edit")
             return
 
-        line = item_to_edit.text()
-        old_name = line.split(" : ")[0]
+        line: str = item_to_edit.text()
+        old_name: str = line.split(" : ")[0]
 
-        new_name = self.lineEdit_name.text().strip()
-        new_score = self.lineEdit_score.text().strip()
+        new_name: str = self.lineEdit_name.text().strip()
+        new_score: str = self.lineEdit_score.text().strip()
 
         if not new_name or not new_score:
             QMessageBox.warning(self, "Error", "Please enter your name and your score")
             return
 
         try:
-            new_score = int(new_score)
+            new_score: int = int(new_score)
         except ValueError:
             QMessageBox.warning(self, "Error", "Score must be a number")
             return
@@ -122,7 +127,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.lineEdit_name.clear()
         self.lineEdit_score.clear()
 
-    def delete(self):
+    def delete(self) -> None:
         """Deletes the selected line in the list widget from the gradebook dictionary"""
         item_to_delete = self.listWidget_grades.currentItem()
 
@@ -141,7 +146,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.grade_curve()
         self.update_list()
 
-    def load(self):
+    def load(self) -> None:
         """Loads a CSV file and updates the gradebook dictionary and list widget with the contents"""
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", ".", "CSV (*.csv)")
 
@@ -169,7 +174,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error!", f"Failed to load file due to {str(e)}")
 
-    def save(self):
+    def save(self) -> None:
         """Saves current gradebook dictionary information to a CSV file in the current directory"""
         filename, _ = QFileDialog.getSaveFileName(self, "Save File", "./", "*.csv")
 
