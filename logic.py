@@ -85,6 +85,10 @@ class Logic(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, "Error", "Score must be less than or equal to 100")
             return
 
+        elif int(score) < 0:
+            QMessageBox.warning(self, "Error", "Score must be a positive number")
+            return
+
         self.gradebook[name] = {"Score": int(score)}
         self.listWidget_grades.addItem(f"{name} : {score}")
         self.grade_curve()
@@ -119,6 +123,8 @@ class Logic(QMainWindow, Ui_MainWindow):
         if new_score > 100:
             QMessageBox.warning(self, "Error", "Score cannot exceed 100")
             return
+        elif new_score < 0:
+            QMessageBox.warning(self, "Error", "Score must be a positive number")
 
         if old_name != new_name:
             if old_name in self.gradebook:
